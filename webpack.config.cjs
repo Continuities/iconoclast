@@ -16,9 +16,6 @@ module.exports = {
     }, {
       test: /\.css$/,
       use: ["style-loader", "css-loader"]
-    }, {
-      test: /\.json/,
-      type: 'asset/resource'
     }]
   },
   resolve: { 

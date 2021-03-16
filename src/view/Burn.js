@@ -5,8 +5,12 @@
  * @flow
  **/
 
-import React, { useEffect } from 'react'
-import { useWeb3Context } from 'web3-react'
+import React, { useEffect, useState } from 'react';
+import { useWeb3Context } from 'web3-react';
+import IconoclastABI from 'Iconoclast.json';
+import { Contract } from 'ethers';
+
+const address = '0x5FbDB2315678afecb367f032d93F642f64180aa3'; // TODO: Config
 
 const getMessage = (context) => {
   if (!context.active && !context.error) {
@@ -22,11 +26,21 @@ const getMessage = (context) => {
 }
 
 const Burn = () => {
+  const [ iconoclast, setIconoclast ] = useState(null);
   const context = useWeb3Context();
- 
   useEffect(() => {
     context.setFirstValidConnector(['MetaMask'])
   }, []);
+  useEffect(() => {
+    if (!context.active) {
+      return;
+    }
+    const signer = context.library.getSigner();
+    const contract = new Contract(address, IconoclastABI, signer);
+    setIconoclast(contract);
+  }, [context.active])
+
+  console.log(iconoclast);
 
   return (
     <div>{getMessage(context)}</div>
