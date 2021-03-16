@@ -11,9 +11,11 @@ contract Iconoclast is ERC721, Ownable {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   
-  constructor() ERC721("Pile of Ashes", "ASH") {}
+  constructor() ERC721("Pile of Ashes", "ASH") Ownable() {
 
-  function burn(address receiver, string memory tokenURI) external onlyOwner returns (uint256) {
+  }
+
+  function burn(address receiver, string memory tokenURI) external returns (uint256) {
     _tokenIds.increment();
 
     uint256 newNftTokenId = _tokenIds.current();

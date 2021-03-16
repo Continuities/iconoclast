@@ -10,20 +10,7 @@ import { useWeb3Context } from 'web3-react';
 import IconoclastABI from 'Iconoclast.json';
 import { Contract } from 'ethers';
 
-const address = '0x5FbDB2315678afecb367f032d93F642f64180aa3'; // TODO: Config
-
-const getMessage = (context) => {
-  if (!context.active && !context.error) {
-    // loading
-    return "Connecting MetaMask...";
-  } else if (context.error) {
-    //error
-    return `ERROR ${context.error}`;
-  } else {
-    // success
-    return context.account;
-  }
-}
+const address = '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'; // TODO: Config
 
 const Burn = () => {
   const [ iconoclast, setIconoclast ] = useState(null);
@@ -40,10 +27,23 @@ const Burn = () => {
     setIconoclast(contract);
   }, [context.active])
 
-  console.log(iconoclast);
+  if (!context.active && !context.error) {
+    return "Connecting MetaMask...";
+  }
+  if (context.error) {
+    return `ERROR ${context.error}`;
+  }
 
   return (
-    <div>{getMessage(context)}</div>
+    <div>
+      { iconoclast && (
+        <button onClick={() => {
+          iconoclast.burn(context.account, "Ceci n'est pas un token");
+        }}>
+          BURN
+        </button>
+      )}
+    </div>
   )
 };
 

@@ -25,7 +25,7 @@ task("abi", "Exports the Iconoclast ABI", async () => {
 module.exports = {
   solidity: "0.7.3",
   abiExporter: {
-    path: './static',
+    path: './src',
     clear: false,
     flat: true,
     only: [':Iconoclast$'],
