@@ -12,10 +12,6 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 });
 
-task("abi", "Exports the Iconoclast ABI", async () => {
-
-});
-
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -28,7 +24,7 @@ module.exports = {
     path: './src',
     clear: false,
     flat: true,
-    only: [':Iconoclast$'],
+    only: [':Iconoclast$', ':ERC721$'],
   }
 };
 
