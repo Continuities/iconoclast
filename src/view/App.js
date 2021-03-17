@@ -9,8 +9,9 @@ import React from 'react';
 import Web3Provider, { Connectors } from 'web3-react';
 import Burn from 'view/Burn.js';
 import Ashes from 'view/Ashes.js';
-import MintButton from 'component/MintButton.js';
 import styled from 'styled-components';
+import { Router } from '@reach/router';
+import MintButton from 'component/MintButton.js';
 
 const Page = styled.div`
   width: 100vw;
@@ -31,9 +32,13 @@ const App = () => {
         connectors={{ MetaMask }}
         libraryName='ethers.js'
       >
-        <Ashes />
-        {/* <MintButton /> */}
-        <Burn />
+        <MintButton />
+        <Router>
+          {/* $FlowIgnore[prop-missing] Flow doesn't like Reach Router */}
+          <Burn path="/"/> 
+          {/* $FlowIgnore[prop-missing] Flow doesn't like Reach Router */}
+          <Ashes path="/:ashesId" />
+        </Router>
       </Web3Provider>
     </Page>
   );

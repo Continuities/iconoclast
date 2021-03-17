@@ -5,8 +5,11 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Iconoclast is ERC721, Ownable {
+
+  event Burnt(uint256);
 
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
@@ -28,18 +31,18 @@ contract Iconoclast is ERC721, Ownable {
     _safeMint(msg.sender, ashesId);
     _setTokenURI(ashesId, tokenURI);
 
-    // Take it
-    tokenContract.transferFrom(msg.sender, address(this), tokenId);
     // Burn it
-    tokenContract.transferFrom(address(this), address(0xDEAD), tokenId);
+    tokenContract.transferFrom(msg.sender, address(0xDEAD), tokenId);
 
-    return ashesId;
+    emit Burnt(ashesId);
   }
 
   function mint() external returns (uint256) {
     _tokenIds.increment();
     uint256 ashesId = _tokenIds.current();
     _safeMint(msg.sender, ashesId);
+    string memory uri = string(abi.encodePacked("https://iconoclast.itsmichael.info/", Strings.toString(ashesId)));
+    _setTokenURI(ashesId, uri);
     return ashesId;
   }
 }

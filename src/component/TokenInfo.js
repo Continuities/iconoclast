@@ -13,17 +13,20 @@ type Props = {|
 
 const TokenInfo = ({ token }: Props) => {
   const [ name, setName ] = useState('');
+  const [ symbol, setSymbol ] = useState('');
   useEffect(() => {
     if (!token) {
-      return;
+      setName('');
+      setSymbol('');
     }
-    token.name().then(n => {
-      setName(n);
-    });
+    else {
+      token.name().then(setName);
+      token.symbol().then(setSymbol);
+    }
   }, [ token ]);
   
   return name && (
-    <div>{name}</div>
+    <div>{name} ({symbol})</div>
   );
 };
 
