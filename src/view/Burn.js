@@ -125,7 +125,7 @@ const Burn = () => {
             ) : (
               <TextField 
                 fullWidth
-                label="address"
+                label="contract address"
                 variant="outlined"
                 error={toBurn && !isValidAddress}
                 value={formData.address}

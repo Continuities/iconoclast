@@ -2,12 +2,11 @@
 pragma solidity ^0.7.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract Iconoclast is ERC721, Ownable {
+contract Iconoclast is ERC721 {
 
   event Burnt(uint256);
 
@@ -16,7 +15,7 @@ contract Iconoclast is ERC721, Ownable {
 
   mapping ( uint256 => string ) private _originalURIs;
   
-  constructor() ERC721("Pile of Ashes", "ASH") Ownable() {}
+  constructor() ERC721("Pile of Ashes", "ASH") {}
 
   function burn(address contractAddress, uint256 tokenId) external returns (uint256) {
 

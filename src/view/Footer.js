@@ -31,7 +31,7 @@ export default () => (
         style={{ marginRight: '10px' }}
         target="_blank" 
         color='secondary'
-        href="https://github.com/Continuities/nineteen">
+        href="https://github.com/Continuities/iconoclast">
         <GitHub style={{ fontSize: '1em' }}/>
       </Link>
       <Link 
