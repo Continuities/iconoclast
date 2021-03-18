@@ -21,7 +21,7 @@ type Props = {|
 |};
 
 const Why = ({ open, onClose }: Props) => (
-  <Dialog open={open}>
+  <Dialog open={open} onClose={onClose}>
     <DialogTitle>What is this?</DialogTitle>
     <DialogContent dividers={scroll === 'paper'}>
       <DialogContentText>
