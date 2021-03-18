@@ -10,12 +10,13 @@ import { navigate } from "@reach/router"
 import { useNFT, useIconoclast } from 'hook/useContract.js';
 import TokenInfo from 'component/TokenInfo.js';
 import { useWeb3Context } from 'web3-react';
+import FlameGif from 'flame.gif';
+import { useSnackbar } from 'provider/SnackbarProvider.js';
 import {
-  Card,
   CardContent,
+  CardHeader,
   CardActions,
   TextField,
-  Typography,
   Grid,
   Button,
   IconButton,
@@ -23,16 +24,25 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
+  Typography
 } from '@material-ui/core';
 import {
   Close as EditIcon
 } from '@material-ui/icons';
+import styled from 'styled-components';
 
 const EMPTY_FORM = {
   address: '',
   id: ''
 };
+
+const Message = styled(Typography)`
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const Burn = () => {
   const context = useWeb3Context();
@@ -42,6 +52,7 @@ const Burn = () => {
   const [ isValidAddress, setValidAddress ] = useState(false);
   const [ isBurning, setBurning ] = useState(false);
   const toBurn = useNFT(formData.address);
+  const sendSnack = useSnackbar();
 
   useEffect(() => {
     if (!toBurn) {
@@ -55,72 +66,78 @@ const Burn = () => {
   }, [ toBurn ])
 
   if (!context.active && !context.error) {
-    return "Connecting...";
+    return (
+      <Message>
+        Connecting...
+      </Message>
+    );
   }
   if (context.error) {
-    return `ERROR ${context.error}`;
+    return (
+      <Message>
+        {String(context.error)}
+      </Message>
+    );
   }
 
   if (isBurning) {
-    return 'BURNING';
+    return <img src={FlameGif} style={{ width: '100%' }}/>;
   }
 
   return (
     <>
-      <Card>
-        <CardContent>
-          <Grid container spacing={2} direction="column">
-            <Grid item>
-              <Typography>
-                Throw your token on the fire.
-              </Typography>
-            </Grid>
-            <Grid item>
-              { toBurn && isValidAddress ? (
-                <Grid container justify="space-between" alignItems="center">
-                  <Grid item>
-                    <TokenInfo token={toBurn} />
-                  </Grid>
-                  <Grid item>
-                    <IconButton 
-                      size="small"
-                      onClick={() => setFormData(EMPTY_FORM)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Grid>
+      <CardHeader 
+        subheader="Throw your token on the fire."
+      />
+      <CardContent style={{ flexGrow: 1, display: 'flex' }}>
+        <Grid container spacing={2} direction="column" style={{ flexGrow: 1 }}>
+          <Grid item>
+            { toBurn && isValidAddress ? (
+              <Grid style={{ height: '56px' }} container justify="space-between" alignItems="center">
+                <Grid item>
+                  <TokenInfo token={toBurn} />
                 </Grid>
-              ) : (
-                <TextField 
-                  label="address"
-                  variant="outlined"
-                  error={toBurn && !isValidAddress}
-                  value={formData.address}
-                  onChange={e => setFormData({...formData, address: e.target.value })}
-                />
-              )}
-            </Grid>
-            <Grid item>
+                <Grid item>
+                  <IconButton 
+                    size="small"
+                    onClick={() => setFormData(EMPTY_FORM)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Grid>
+              </Grid>
+            ) : (
               <TextField 
-                disabled={!toBurn}
-                label="token id"
+                fullWidth
+                label="address"
                 variant="outlined"
-                value={formData.id}
-                onChange={e => setFormData({...formData, id: e.target.value })}
+                error={toBurn && !isValidAddress}
+                value={formData.address}
+                onChange={e => setFormData({...formData, address: e.target.value })}
               />
-            </Grid>
+            )}
           </Grid>
-        </CardContent>
-        <CardActions>
-          <Button 
-            fullWidth
-            disabled={!(iconoclast && toBurn && formData.id)}
-            onClick={() => setConfirmOpen(true)}
-          >
-            BURN
-          </Button>
-        </CardActions>
-      </Card>
+          <Grid item>
+            <TextField 
+              fullWidth
+              disabled={!toBurn}
+              label="token id"
+              variant="outlined"
+              value={formData.id}
+              onChange={e => setFormData({...formData, id: e.target.value })}
+            />
+          </Grid>
+        </Grid>
+      </CardContent>
+      <CardActions>
+        <Button 
+          fullWidth
+          disabled={!(iconoclast && toBurn && formData.id)}
+          onClick={() => setConfirmOpen(true)}
+        >
+          BURN
+        </Button>
+      </CardActions>
       <Dialog 
         open={isConfirmOpen}
         onClose={() => { setConfirmOpen(false); }}
@@ -132,17 +149,24 @@ const Burn = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          <Button onClick={() => { setConfirmOpen(false); }}>Cancel</Button>
           <Button onClick={async () => {
             setConfirmOpen(false);
             setBurning(true);
-            await toBurn.approve(iconoclast.address, formData.id);
-            const tx = await iconoclast.burn(formData.address, formData.id);
-            const receipt = await tx.wait();
-            const burntEvent = receipt.events.pop();
-            console.log(`Received ashes`, burntEvent.args[0]);
-            navigate(`/${burntEvent.args[0]}`);
+            try {
+              await toBurn.approve(iconoclast.address, formData.id);
+              const tx = await iconoclast.burn(formData.address, formData.id);
+              const receipt = await tx.wait();
+              const burntEvent = receipt.events.pop();
+              console.log(`Received ashes`, burntEvent.args[0]);
+              navigate(`/${burntEvent.args[0]}`);
+            }
+            catch (err) {
+              setBurning(false);
+              const msg = err?.data?.message || 'Transaction failed';
+              sendSnack({ type: 'error', message: msg });
+            }
           }}>Burn it</Button>
-          <Button onClick={() => { setConfirmOpen(false); }}>Cancel</Button>
         </DialogActions>
       </Dialog>
     </>

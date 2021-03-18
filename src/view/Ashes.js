@@ -8,9 +8,11 @@
 import React, { useState, useEffect } from 'react';
 import { useIconoclast } from 'hook/useContract.js';
 import { useWeb3Context } from 'web3-react';
+import AshImage from 'ash.jpg';
 import {
-  Card,
-  CardContent
+  CardContent,
+  Typography,
+  Link
 } from '@material-ui/core';
 
 type Props = {|
@@ -21,23 +23,26 @@ type Props = {|
 const Ashes = ({ ashesId }: Props) => {
   const context = useWeb3Context();
   const iconoclast = useIconoclast();
-  const [ tokenURI, setTokenURI ] = useState(null);
+  const [ link, setLink ] = useState(null);
 
   useEffect(() => {
     if (context.account && iconoclast) {
       iconoclast
-        .tokenURI(ashesId)
-        .then(setTokenURI)
-        .catch(() => setTokenURI(null));
+        .originalURI(ashesId)
+        .then(setLink)
+        .catch(() => setLink(null));
     }
   }, [ context.account, iconoclast ]);
 
   return (
-    <Card>
-      <CardContent>
-        {tokenURI}
-      </CardContent>
-    </Card>
+    <CardContent style={{ maxHeight: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <img src={AshImage} style={{ height: 0, flex: 1 }}/>
+      <Link href={link} color="textPrimary" style={{ height: '24px' }}>
+        <Typography align="center">
+          {link || ''}
+        </Typography>
+      </Link>
+    </CardContent>
   );
 };
 

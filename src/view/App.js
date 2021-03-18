@@ -11,7 +11,8 @@ import Burn from 'view/Burn.js';
 import Ashes from 'view/Ashes.js';
 import styled from 'styled-components';
 import { Router } from '@reach/router';
-import MintButton from 'component/MintButton.js';
+import SnackbarProvider from 'provider/SnackbarProvider.js';
+import { Card } from '@material-ui/core';
 
 const Page = styled.div`
   width: 100vw;
@@ -22,24 +23,35 @@ const Page = styled.div`
   justify-content: center;
 `;
 
+const ContentRouter = styled(Router)`
+  width: 300px;
+  height: 300px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+`;
+
 const App = () => {
 
   const MetaMask = new Connectors.InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42] });
 
   return (
     <Page>
-      <Web3Provider
-        connectors={{ MetaMask }}
-        libraryName='ethers.js'
-      >
-        <MintButton />
-        <Router>
-          {/* $FlowIgnore[prop-missing] Flow doesn't like Reach Router */}
-          <Burn path="/"/> 
-          {/* $FlowIgnore[prop-missing] Flow doesn't like Reach Router */}
-          <Ashes path="/:ashesId" />
-        </Router>
-      </Web3Provider>
+      <SnackbarProvider>
+        <Web3Provider
+          connectors={{ MetaMask }}
+          libraryName='ethers.js'
+        >
+          <Card>
+            <ContentRouter>
+              {/* $FlowIgnore[prop-missing] Flow doesn't like Reach Router */}
+              <Burn path="/"/> 
+              {/* $FlowIgnore[prop-missing] Flow doesn't like Reach Router */}
+              <Ashes path="/:ashesId" />
+            </ContentRouter>
+          </Card>
+        </Web3Provider>
+      </SnackbarProvider>
     </Page>
   );
 };

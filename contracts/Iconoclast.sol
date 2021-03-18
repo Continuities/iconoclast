@@ -13,6 +13,8 @@ contract Iconoclast is ERC721, Ownable {
 
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
+
+  mapping ( uint256 => string ) private _originalURIs;
   
   constructor() ERC721("Pile of Ashes", "ASH") Ownable() {}
 
@@ -23,26 +25,25 @@ contract Iconoclast is ERC721, Ownable {
     // Only allow people to burn their own tokens
     require(tokenContract.ownerOf(tokenId) == msg.sender, "Caller does not own the provided token");
 
-    string memory tokenURI = tokenContract.tokenURI(tokenId);
+    string memory original = tokenContract.tokenURI(tokenId);
 
     _tokenIds.increment();
 
     uint256 ashesId = _tokenIds.current();
+    string memory tokenURI = string(abi.encodePacked("https://iconoclast.itsmichael.info/", Strings.toString(ashesId)));
     _safeMint(msg.sender, ashesId);
     _setTokenURI(ashesId, tokenURI);
+    _originalURIs[ashesId] = original;
 
     // Burn it
     tokenContract.transferFrom(msg.sender, address(0xDEAD), tokenId);
 
     emit Burnt(ashesId);
+    return ashesId;
   }
 
-  function mint() external returns (uint256) {
-    _tokenIds.increment();
-    uint256 ashesId = _tokenIds.current();
-    _safeMint(msg.sender, ashesId);
-    string memory uri = string(abi.encodePacked("https://iconoclast.itsmichael.info/", Strings.toString(ashesId)));
-    _setTokenURI(ashesId, uri);
-    return ashesId;
+  function originalURI(uint256 tokenId) external view returns (string memory) {
+    require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    return _originalURIs[tokenId];
   }
 }
