@@ -11,6 +11,7 @@ import { useNFT, useIconoclast } from 'hook/useContract.js';
 import TokenInfo from 'component/TokenInfo.js';
 import { useWeb3Context } from 'web3-react';
 import FlameGif from 'flame.gif';
+import Why from 'view/Why.js';
 import { useSnackbar } from 'provider/SnackbarProvider.js';
 import {
   CardContent,
@@ -25,10 +26,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Typography
+  Typography,
+  Link
 } from '@material-ui/core';
 import {
-  Close as EditIcon
+  Close as CloseIcon,
+  Help as HelpIcon
 } from '@material-ui/icons';
 import styled from 'styled-components';
 
@@ -42,6 +45,7 @@ const Message = styled(Typography)`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 `;
 
 const Burn = () => {
@@ -51,6 +55,7 @@ const Burn = () => {
   const [ isConfirmOpen, setConfirmOpen ] = useState(false);
   const [ isValidAddress, setValidAddress ] = useState(false);
   const [ isBurning, setBurning ] = useState(false);
+  const [ whyOpen, setWhyOpen ] = useState(false);
   const toBurn = useNFT(formData.address);
   const sendSnack = useSnackbar();
 
@@ -74,8 +79,14 @@ const Burn = () => {
   }
   if (context.error) {
     return (
-      <Message>
-        {String(context.error)}
+      <Message align='center'>
+        {String(context.error)}<br/>
+        <Link style={{ cursor: 'pointer' }} onClick={() => {
+          context.unsetConnector();
+          context.setFirstValidConnector(['MetaMask']);
+        }}>
+          Reconnect your MetaMask wallet.
+        </Link>
       </Message>
     );
   }
@@ -88,6 +99,11 @@ const Burn = () => {
     <>
       <CardHeader 
         subheader="Throw your token on the fire."
+        action={
+          <IconButton onClick={()=>setWhyOpen(true)} size="small">
+            <HelpIcon style={{ opacity: 0.3 }}/>
+          </IconButton>
+        }
       />
       <CardContent style={{ flexGrow: 1, display: 'flex' }}>
         <Grid container spacing={2} direction="column" style={{ flexGrow: 1 }}>
@@ -102,7 +118,7 @@ const Burn = () => {
                     size="small"
                     onClick={() => setFormData(EMPTY_FORM)}
                   >
-                    <EditIcon />
+                    <CloseIcon />
                   </IconButton>
                 </Grid>
               </Grid>
@@ -132,6 +148,7 @@ const Burn = () => {
       <CardActions>
         <Button 
           fullWidth
+          color="primary" 
           disabled={!(iconoclast && toBurn && formData.id)}
           onClick={() => setConfirmOpen(true)}
         >
@@ -150,7 +167,7 @@ const Burn = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => { setConfirmOpen(false); }}>Cancel</Button>
-          <Button onClick={async () => {
+          <Button color="primary" onClick={async () => {
             setConfirmOpen(false);
             setBurning(true);
             try {
@@ -169,6 +186,7 @@ const Burn = () => {
           }}>Burn it</Button>
         </DialogActions>
       </Dialog>
+      <Why open={whyOpen} onClose={() => setWhyOpen(false)} />
     </>
   );
 };

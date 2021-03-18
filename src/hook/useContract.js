@@ -32,7 +32,7 @@ const useContract = (address:string, abi:Object) => {
 
 export const useIconoclast = () => useContract(
   // TODO: Make the address configurable
-  '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+  '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318',
   IconoclastABI
 );
 
